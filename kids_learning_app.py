@@ -113,10 +113,17 @@ SPELL_WORDS = [
 # Audio helper
 # ─────────────────────────────────────────────────────────────────────────────
 _audio_cache = {}
+_last_speak: list = [0.0, ""]   # [timestamp, text]
 
 def speak(text: str):
     if not AUDIO_OK:
         return
+    import time as _time
+    now = _time.monotonic()
+    if text == _last_speak[1] and now - _last_speak[0] < 0.5:
+        return   # same text within 500 ms → ignore duplicate
+    _last_speak[0] = now
+    _last_speak[1] = text
     def _do():
         try:
             key = text.lower().strip()
@@ -373,7 +380,6 @@ class KidsApp(tk.Tk):
                     text=f"{l} is for {w} {em}", bg=c)
                 detail.configure(bg=c)
                 speak(f"{l}. {l} is for {w}. {w}.")
-                return "break"
             card.bind("<Button-1>", on_click)
             for ch in card.winfo_children():
                 ch.bind("<Button-1>", on_click)
@@ -437,7 +443,6 @@ class KidsApp(tk.Tk):
                     text=f"{em}  {n}  —  {w}  {em}", bg=c)
                 detail.configure(bg=c)
                 speak(f"{n}. {w}.")
-                return "break"
             card.bind("<Button-1>", on_click)
             for ch in card.winfo_children():
                 ch.bind("<Button-1>", on_click)
@@ -498,7 +503,6 @@ class KidsApp(tk.Tk):
                     text=f"{em}  {l}  =  {w}", bg=c)
                 detail.configure(bg=c)
                 speak(h)
-                return "break"
             card.bind("<Button-1>", on_click)
             for ch in card.winfo_children():
                 ch.bind("<Button-1>", on_click)
@@ -555,7 +559,6 @@ class KidsApp(tk.Tk):
                 self._math_lbl.configure(text=f"{s}  {n} — {d}", bg=c)
                 detail.configure(bg=c)
                 speak(f"{n}. {d}")
-                return "break"
             card.bind("<Button-1>", on_click)
             for ch in card.winfo_children():
                 ch.bind("<Button-1>", on_click)
@@ -637,8 +640,8 @@ class KidsApp(tk.Tk):
 
             phrase = f"{num} times {i} equals {result}"
             row.bind("<Button-1>", lambda e, p=phrase: speak(p))
-            lbl.bind("<Button-1>", lambda e, p=phrase: speak(p) or "break")
-            sound_lbl.bind("<Button-1>", lambda e, p=phrase: speak(p) or "break")
+            lbl.bind("<Button-1>", lambda e, p=phrase: speak(p))
+            sound_lbl.bind("<Button-1>", lambda e, p=phrase: speak(p))
 
             def enter(e, w=row, c=color):
                 w.configure(bg=c)
