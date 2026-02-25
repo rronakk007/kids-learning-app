@@ -4,7 +4,7 @@ A colorful, fun learning app for 3-year-olds!
 Topics: Alphabets, Numbers, Words, Math Signs, Tables
 
 Requirements:
-    pip install gtts pygame pillow
+    pip install gtts pygame
 
 Run: python kids_learning_app.py
 """
@@ -159,6 +159,7 @@ class KidsApp(tk.Tk):
         self._build_layout()
         self._show_home()
         self.after(200, self._animate_stars)  # Delay until window is fully rendered
+        self.protocol("WM_DELETE_WINDOW", self._on_closing)
 
     # ── Layout skeleton ───────────────────────────────────────────────────────
     def _build_layout(self):
@@ -211,6 +212,7 @@ class KidsApp(tk.Tk):
                      ).pack(side="right", padx=4, pady=16)
 
     def _clear_content(self):
+        self.unbind_all("<MouseWheel>")
         for w in self.content.winfo_children():
             w.destroy()
 
@@ -295,6 +297,14 @@ class KidsApp(tk.Tk):
                  font=self.f_small, bg=COLORS["bg"], fg=COLORS["teal"]
                  ).pack(pady=20)
 
+    def _on_closing(self):
+        for path in _audio_cache.values():
+            try:
+                os.unlink(path)
+            except Exception:
+                pass
+        self.destroy()
+
     def _darken(self, hex_color):
         r = int(hex_color[1:3],16)
         g = int(hex_color[3:5],16)
@@ -363,6 +373,7 @@ class KidsApp(tk.Tk):
                     text=f"{l} is for {w} {em}", bg=c)
                 detail.configure(bg=c)
                 speak(f"{l}. {l} is for {w}. {w}.")
+                return "break"
             card.bind("<Button-1>", on_click)
             for ch in card.winfo_children():
                 ch.bind("<Button-1>", on_click)
@@ -426,6 +437,7 @@ class KidsApp(tk.Tk):
                     text=f"{em}  {n}  —  {w}  {em}", bg=c)
                 detail.configure(bg=c)
                 speak(f"{n}. {w}.")
+                return "break"
             card.bind("<Button-1>", on_click)
             for ch in card.winfo_children():
                 ch.bind("<Button-1>", on_click)
@@ -486,6 +498,7 @@ class KidsApp(tk.Tk):
                     text=f"{em}  {l}  =  {w}", bg=c)
                 detail.configure(bg=c)
                 speak(h)
+                return "break"
             card.bind("<Button-1>", on_click)
             for ch in card.winfo_children():
                 ch.bind("<Button-1>", on_click)
@@ -542,6 +555,7 @@ class KidsApp(tk.Tk):
                 self._math_lbl.configure(text=f"{s}  {n} — {d}", bg=c)
                 detail.configure(bg=c)
                 speak(f"{n}. {d}")
+                return "break"
             card.bind("<Button-1>", on_click)
             for ch in card.winfo_children():
                 ch.bind("<Button-1>", on_click)
@@ -622,9 +636,9 @@ class KidsApp(tk.Tk):
             sound_lbl.pack(side="right", padx=10)
 
             phrase = f"{num} times {i} equals {result}"
-            row.bind("<Button-1>", lambda e, p=phrase, r=row_color: speak(p))
-            lbl.bind("<Button-1>", lambda e, p=phrase: speak(p))
-            sound_lbl.bind("<Button-1>", lambda e, p=phrase: speak(p))
+            row.bind("<Button-1>", lambda e, p=phrase: speak(p))
+            lbl.bind("<Button-1>", lambda e, p=phrase: speak(p) or "break")
+            sound_lbl.bind("<Button-1>", lambda e, p=phrase: speak(p) or "break")
 
             def enter(e, w=row, c=color):
                 w.configure(bg=c)
