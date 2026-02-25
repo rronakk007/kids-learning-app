@@ -373,6 +373,7 @@ class KidsApp(tk.Tk):
                     text=f"{l} is for {w} {em}", bg=c)
                 detail.configure(bg=c)
                 speak(f"{l}. {l} is for {w}. {w}.")
+                return "break"
             card.bind("<Button-1>", on_click)
             for ch in card.winfo_children():
                 ch.bind("<Button-1>", on_click)
@@ -436,6 +437,7 @@ class KidsApp(tk.Tk):
                     text=f"{em}  {n}  —  {w}  {em}", bg=c)
                 detail.configure(bg=c)
                 speak(f"{n}. {w}.")
+                return "break"
             card.bind("<Button-1>", on_click)
             for ch in card.winfo_children():
                 ch.bind("<Button-1>", on_click)
@@ -496,6 +498,7 @@ class KidsApp(tk.Tk):
                     text=f"{em}  {l}  =  {w}", bg=c)
                 detail.configure(bg=c)
                 speak(h)
+                return "break"
             card.bind("<Button-1>", on_click)
             for ch in card.winfo_children():
                 ch.bind("<Button-1>", on_click)
@@ -552,6 +555,7 @@ class KidsApp(tk.Tk):
                 self._math_lbl.configure(text=f"{s}  {n} — {d}", bg=c)
                 detail.configure(bg=c)
                 speak(f"{n}. {d}")
+                return "break"
             card.bind("<Button-1>", on_click)
             for ch in card.winfo_children():
                 ch.bind("<Button-1>", on_click)
@@ -632,9 +636,9 @@ class KidsApp(tk.Tk):
             sound_lbl.pack(side="right", padx=10)
 
             phrase = f"{num} times {i} equals {result}"
-            row.bind("<Button-1>", lambda e, p=phrase, r=row_color: speak(p))
-            lbl.bind("<Button-1>", lambda e, p=phrase: speak(p))
-            sound_lbl.bind("<Button-1>", lambda e, p=phrase: speak(p))
+            row.bind("<Button-1>", lambda e, p=phrase: speak(p))
+            lbl.bind("<Button-1>", lambda e, p=phrase: speak(p) or "break")
+            sound_lbl.bind("<Button-1>", lambda e, p=phrase: speak(p) or "break")
 
             def enter(e, w=row, c=color):
                 w.configure(bg=c)
