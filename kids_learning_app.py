@@ -4,7 +4,7 @@ A colorful, fun learning app for 3-year-olds!
 Topics: Alphabets, Numbers, Words, Math Signs, Tables
 
 Requirements:
-    pip install gtts pygame pillow
+    pip install gtts pygame
 
 Run: python kids_learning_app.py
 """
@@ -159,6 +159,7 @@ class KidsApp(tk.Tk):
         self._build_layout()
         self._show_home()
         self.after(200, self._animate_stars)  # Delay until window is fully rendered
+        self.protocol("WM_DELETE_WINDOW", self._on_closing)
 
     # ── Layout skeleton ───────────────────────────────────────────────────────
     def _build_layout(self):
@@ -211,6 +212,7 @@ class KidsApp(tk.Tk):
                      ).pack(side="right", padx=4, pady=16)
 
     def _clear_content(self):
+        self.unbind_all("<MouseWheel>")
         for w in self.content.winfo_children():
             w.destroy()
 
@@ -294,6 +296,14 @@ class KidsApp(tk.Tk):
         tk.Label(f, text="🔊 Tap any card to hear the sound!",
                  font=self.f_small, bg=COLORS["bg"], fg=COLORS["teal"]
                  ).pack(pady=20)
+
+    def _on_closing(self):
+        for path in _audio_cache.values():
+            try:
+                os.unlink(path)
+            except Exception:
+                pass
+        self.destroy()
 
     def _darken(self, hex_color):
         r = int(hex_color[1:3],16)
